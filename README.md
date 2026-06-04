@@ -67,7 +67,7 @@ Step 7 - Created CLIENT01 and Joined Domain
   •  Installed Windows Server 2025 on CLIENT01 VM
   •  Set static IP: 192.168.1.20
   •  Set DNS to point to DC01: 19.168.1.10
-  •  Joined domian lab.local via sysdm.cpl
+  •  Joined domain lab.local via sysdm.cpl
   •  Authenticated with LAB\Administrator credentials
 
 Step 8 - Tested Domain Authentication
@@ -77,27 +77,40 @@ Step 8 - Tested Domain Authentication
 
 
 
-Issues Encountered and How I Fixed Them
-   Issue 1 - VM not booting from ISO
-     •  Cause: Boot order had Hard Disk above optical
-     •  Fix: Changed the boot order in VirtualBox Settings -> System -> Boot Order to put Optical Drive first
+## Issues Encountered and How I Fixed Them
 
-   Issue 2 - Partition not available during Windows Server install
-     •  Cause: Disk showed as unallocated with no New option visible
-     •  Fix: Used Create Partition option to initialize the disk before installing
-      
-   Issue 3 - DC01 network adapter was set to NAT after domain promotion
-     •  Cause: Network Adapter was changed from NAT to Bridged Adapter after AD DS was already promoted, causing DNS records to register against the wrong network
-     •  Fix: Demoted DC01 using Uninstall-ADDSDomainController, corrected network settings, then repromoted
+---
 
-   Issue 4 - IP6 DNS servers interfering with domain join
-     •  Cause: Bridge Adapter inherited IPV6 DNS servers from the home router which took priority over DC01's DNS
-     •  Symptoms: nslookup lab.local timed out, nltest /dsgetdc:lab.local returned ERROR_NO_SUCH_DOMAIN
-     •  Fix: Disabled IPv6 on both DC01 and CLIENT01 via network adapter properties (ncpa.cpl)
+  ### Issue 1 - VM not booting from ISO
+     •  **Cause:** Boot order had Hard Disk above optical
+     •  **Fix:** Changed the boot order in VirtualBox Settings -> System -> Boot Order to put Optical Drive first
+
+  ### Issue 2 - Partition not available during Windows Server install
+     •  **Cause:** Disk showed as unallocated with no New option visible
+     •  **Fix:** Used the Create Partition option to initialize the disk before installing
       
-   Issue 5 - CLIENT01 rebooting into Windows Setup instead of installed OS
-     •  Cause: Boot order reverted to Optical above Hard Disk after VM reset
-     •  Fix: Changed boot order in VirtualBox to Hard Disk first
+  ### Issue 3 - DC01 network adapter was set to NAT after domain promotion
+     •  **Cause:** Network Adapter was changed from NAT to Bridged Adapter after AD DS was already promoted, causing DNS records to register against the wrong network
+     •  **Fix:** Demoted DC01 using Uninstall-ADDSDomainController, corrected network settings, then repromoted
+
+ ### Issue 4 - IP6 DNS servers interfering with domain join
+     •  **Cause:** Bridge Adapter inherited IPV6 DNS servers from the home router, which took priority over DC01's DNS
+     •  **Symptoms:** nslookup lab.local timed out, nltest /dsgetdc:lab.local returned ERROR_NO_SUCH_DOMAIN
+     • **Fix:** Disabled IPv6 on both DC01 and CLIENT01 via network adapter properties (ncpa.cpl)
+      
+  ### Issue 5 - CLIENT01 rebooting into Windows Setup instead of installed OS
+     •  **Cause:** Boot order reverted to Optical above Hard Disk after VM reset
+     •  **Fix:** Changed boot order in VirtualBox to Hard Disk first
+
+ ### Issue 6 - Sign-in method not allowed after password policy was set
+     •  **Cause:** Allow log on locally policy did not include Domain Users or Administrators 
+     •  **Symptoms:** "The sign-in method you're trying to use isn't allowed" error on CLIENT01
+     •  **Fix:** Edited Default Domain Policy -> Local Policies -> User Rights Assignment -> Allow log on locally -> added Domain Users and Administrators
+
+ ### Issue 7 - User in wrong security group
+     •  **Cause:** ajohnson was accidentally added to Accounting instead of Helpdesk
+     •  **Symptoms:** whoami /groups showed LAB\Accounting instead of LAB\Helpdesk
+     •  **Fix:** Removed ajohnson from Accounting, added to Helpdesk in ADUC. Logged out and back in to rebuild token
 
 
 
@@ -136,6 +149,12 @@ What I learned
  •  How IPv6 DNS entries from a home router can interfere with lab environments
  •  How to use dcdiag and nltest to diagnose AD and DNS issues
  •  How VirtualBox networking modes (NAT vs Bridged vs Internal) affect VM communication
+ •  How to configure password policies via Group Policy
+ •  How to create and assign Logon Scripts to domain users
+ •  How to delegate specific AD permissions to security groups without granting full admin rights
+ •  How to organize computer accounts into OUs for Group Policy targeting
+ •  How user tokens work and why logging out and back in is required after group membership changes
+ •  How the Allow log on locally policy controls which users can sign into a machine
 
   
 
@@ -145,3 +164,33 @@ Next Steps
  •  Practice password resets and account management
  •  Delegate help desk permissions to the Helpdesk security group
  •   Set up a logon script
+
+### Bonus Tasks Completed
+
+**Bonus Task 1 - Set Password Policy via Group Policy**
+- Opened Group Policy Management on DC01
+- Edited Default Domain Policy
+- Navigated to Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies -> Password Policy
+- Configured the following settings:
+  - Minimum password length: 10 characters
+  - Maximum password age: 90 days
+  - Minimum password age: 1 day
+  - Password must meet complexity requirements: Enabled
+
+**Bonus Task 2 - Created a Logon Scripts**
+- Created logon.bat in C:\Windows\SYSVOL\sysvol\lab.local\scripts
+- Script displays a welcome message with the username on login
+- Assigned script to ajohnson via ADUC profile tab
+- Verified script runs on CLIENT01 login
+
+**Bonus Task 3 - Delegated Password Reset to Helpdesk**
+- Right-clicked Houston -> Users OU in ADUC
+- User Delegate Control Wizard
+- Granted Helpdesk group permission to reset user passwords and force password change at next logon
+- Helpdesk can now reset passwords without Domain Admin rights
+
+**Bonus task 4 - Moved CLIENT01 into correct OU**
+- Located CLIENT01 computer account in the default Computers container
+- Moved it to _Branches -> Houston -> Workstations
+- Ran gpupdate /force on CLIENT01 to apply OU-level Group Policy
+ 
