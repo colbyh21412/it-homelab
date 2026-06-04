@@ -1,4 +1,4 @@
-IT Home Lab
+# IT Home Lab
 
 About This Lab:
 This repository documents my hand-on IT home lab. This is being worked on and built to build skills towards an entry-level IT support role. This lab is built using VirtualBox on a local machine using Windows Server 2025 ISO - no cloud services required.
@@ -21,7 +21,7 @@ Environment:
 • Domain: lab.local
 • Network: VirtualBox Bridged Adapter
 
-What I built
+## What I built
 
 Step 1 - Created DC01 VM in VirtualBox
   •  Installed Windows Server 2025 (Desktop Experience)
@@ -82,62 +82,79 @@ Step 8 - Tested Domain Authentication
 ---
 
   ### Issue 1 - VM not booting from ISO
-     •  **Cause:** Boot order had Hard Disk above optical
-     •  **Fix:** Changed the boot order in VirtualBox Settings -> System -> Boot Order to put Optical Drive first
+•  **Cause:** Boot order had Hard Disk above optical
+
+•  **Fix:** Changed the boot order in VirtualBox Settings -> System -> Boot Order to put Optical Drive first
 
   ### Issue 2 - Partition not available during Windows Server install
-     •  **Cause:** Disk showed as unallocated with no New option visible
-     •  **Fix:** Used the Create Partition option to initialize the disk before installing
+•  **Cause:** Disk showed as unallocated with no New option visible
+
+•  **Fix:** Used the Create Partition option to initialize the disk before installing
       
   ### Issue 3 - DC01 network adapter was set to NAT after domain promotion
-     •  **Cause:** Network Adapter was changed from NAT to Bridged Adapter after AD DS was already promoted, causing DNS records to register against the wrong network
-     •  **Fix:** Demoted DC01 using Uninstall-ADDSDomainController, corrected network settings, then repromoted
+•  **Cause:** Network Adapter was changed from NAT to Bridged Adapter after AD DS was already promoted, causing DNS records to register against the wrong network
+     
+•  **Fix:** Demoted DC01 using Uninstall-ADDSDomainController, corrected network settings, then repromoted
 
  ### Issue 4 - IP6 DNS servers interfering with domain join
-     •  **Cause:** Bridge Adapter inherited IPV6 DNS servers from the home router, which took priority over DC01's DNS
-     •  **Symptoms:** nslookup lab.local timed out, nltest /dsgetdc:lab.local returned ERROR_NO_SUCH_DOMAIN
-     • **Fix:** Disabled IPv6 on both DC01 and CLIENT01 via network adapter properties (ncpa.cpl)
+•  **Cause:** Bridge Adapter inherited IPV6 DNS servers from the home router, which took priority over DC01's DNS
+
+•  **Symptoms:** nslookup lab.local timed out, nltest /dsgetdc:lab.local returned ERROR_NO_SUCH_DOMAIN
+
+•  **Fix:** Disabled IPv6 on both DC01 and CLIENT01 via network adapter properties (ncpa.cpl)
       
   ### Issue 5 - CLIENT01 rebooting into Windows Setup instead of installed OS
-     •  **Cause:** Boot order reverted to Optical above Hard Disk after VM reset
-     •  **Fix:** Changed boot order in VirtualBox to Hard Disk first
+•  **Cause:** Boot order reverted to Optical above Hard Disk after VM reset
+     
+•  **Fix:** Changed boot order in VirtualBox to Hard Disk first
 
  ### Issue 6 - Sign-in method not allowed after password policy was set
-     •  **Cause:** Allow log on locally policy did not include Domain Users or Administrators 
-     •  **Symptoms:** "The sign-in method you're trying to use isn't allowed" error on CLIENT01
-     •  **Fix:** Edited Default Domain Policy -> Local Policies -> User Rights Assignment -> Allow log on locally -> added Domain Users and Administrators
+•  **Cause:** Allow log on locally policy did not include Domain Users or Administrators 
+     
+•  **Symptoms:** "The sign-in method you're trying to use isn't allowed" error on CLIENT01
+     
+•  **Fix:** Edited Default Domain Policy -> Local Policies -> User Rights Assignment -> Allow log on locally -> added Domain Users and Administrators
 
  ### Issue 7 - User in wrong security group
-     •  **Cause:** ajohnson was accidentally added to Accounting instead of Helpdesk
-     •  **Symptoms:** whoami /groups showed LAB\Accounting instead of LAB\Helpdesk
-     •  **Fix:** Removed ajohnson from Accounting, added to Helpdesk in ADUC. Logged out and back in to rebuild token
+•  **Cause:** ajohnson was accidentally added to Accounting instead of Helpdesk
+     
+•  **Symptoms:** whoami /groups showed LAB\Accounting instead of LAB\Helpdesk
+     
+•  **Fix:** Removed ajohnson from Accounting, added to Helpdesk in ADUC. Logged out and back in to rebuild token
 
 
 
-Key Commands Used
- # Network diagnostics
- ipconfig /all
- ipconfig /flushdns
- ipconfig /registerdns
- ping 192.168.1.10
- nslookup lab.local
- tracert 192.168.1.10
+# Key Commands Used
 
- # Domain Diagnostics
- nltest /dsgetdc:lab.local
- dcdiag /test:dns
- whoami /groups
+ ## Network diagnostics
+ ```
+ ipconfig /all               # View full network configuration          
+ ipconfig /flushdns          # Clear DNS cache
+ ipconfig /registerdns       # Re-register DNS records
+ ping 192.168.1.10           # Test connectivity to DC01
+ nslookup lab.local          # Test DNS resolution
+ tracert 192.168.1.10        # Trace route to DC01
 
- # DNS and Services
- net stop dns
- net start dns
- Restart-Service DNS
- Resolve-DnsName lab.local
+ ```
+## Domain Diagnostics
+ ```
+ nltest /dsgetdc:lab.local   # Locate the domain controller
+ dcdiag /test:dns            # Run full DNS diagnostic on DC
+ whoami /groups              # view current user's group memberships
+ ```
+## DNS and Services
+ ```
+ net stop dns                # Stop the DNS service
+ net start dns               # Start the DNS service
+ Restart-Service DNS         # Restart DNS via PowerShell
+ Resolve-DnsName lab.local   # Test DNS resolution via power shell
 
- # AD demotion
+ ```
+ ## AD demotion
+ ```
+ # demote DC01 - used when repromoting was needed to fix DNS issues
  Uninstall-ADDSDomainController -DemoteOperationMasterRole -RemoveApplicationPartitions -Force -LastDomainControllerInDomain
-
-
+ ```
 
 What I learned
  •  How to install and configure Active Directory Domain Services on Windows Server
