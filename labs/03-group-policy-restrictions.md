@@ -1,21 +1,21 @@
-##Lab 03 — Group Policy Restrictions
+# Lab 03 — Group Policy Restrictions
 Date: June 2026
 Platform: VirtualBox
 Environment: lab.local domain (built in Lab 01)
 
-#Objective
+## Objective
 Configure Group Policy Objects (GPOs) to restrict standard user access to specific system tools and resources on CLIENT01, while ensuring Domain Admins retain full access.
 
-#Environment
+## Environment
 MachineRoleIP AddressDC01Domain Controller192.168.1.10CLIENT01Domain-joined workstation192.168.1.20
 
-#GPO Created
+## GPO Created
 Name: Restrict Standard Users
 Linked to: _Branches → Houston → Users OU
 Security Filtering: Domain Users (standard users only — Domain Admins excluded)
 
-#What I Did
-Step 1 — Created the Restrict Standard Users GPO
+## What I Did
+### Step 1 — Created the Restrict Standard Users GPO
 
 Opened Group Policy Management on DC01
 Right-clicked _Branches → Houston → Users OU
