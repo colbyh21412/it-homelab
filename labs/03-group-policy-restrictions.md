@@ -9,56 +9,84 @@
 Configure Group Policy Objects (GPOs) to restrict standard user access to specific system tools and resources on CLIENT01, while ensuring Domain Admins retain full access.
 
 ## Environment
-MachineRoleIP AddressDC01Domain Controller192.168.1.10CLIENT01Domain-joined workstation192.168.1.20
+| Machine | Role | IP Address |
+| :--- | :--- | :--- |
+| DCO1    | Domain Controller | 192.168.1.10 |
+| CLIENT01 | Domain-joined Workstation | 192.168.1.20 |
 
 ## GPO Created
-Name: Restrict Standard Users
-Linked to: _Branches → Houston → Users OU
-Security Filtering: Domain Users (standard users only — Domain Admins excluded)
+**Name:** Restrict Standard Users
+
+**Linked to:** _Branches → Houston → Users OU
+
+**Security Filtering:** Domain Users (standard users only — Domain Admins excluded)
 
 ## What I Did
-Step 1 — Created the Restrict Standard Users GPO
+### Step 1 — Created the Restrict Standard Users GPO
 
 •  Opened Group Policy Management on DC01
+
 •  Right-clicked _Branches → Houston → Users OU
+
 •  Selected Create a GPO in this domain and link it here
+
 •  Named it Restrict Standard Users
+
 •  Set Security Filtering to Domain Users to exclude Domain Admins from the policy
 
-Step 2 — Blocked Control Panel and Windows Settings
-Navigated to:
+
+
+### Step 2 — Blocked Control Panel and Windows Settings
+
+**Navigated to:**
 User Configuration → Policies → Administrative Templates → Control Panel
 
-Set Prohibit access to Control Panel and PC Settings to Enabled
+• Set Prohibit access to Control Panel and PC Settings to Enabled
 
 Result: Standard users receive "This operation has been cancelled due to restrictions" when attempting to open Control Panel or Windows Settings
-Step 3 — Disabled Command Prompt for Standard Users
-Navigated to:
-User Configuration → Policies → Administrative Templates → System
+
+### Step 3 — Disabled Command Prompt for Standard Users
+**Navigated to:**
+> User Configuration → Policies → Administrative Templates → System
+
 •  Set Prevent access to the command prompt to Enabled
+
 •  Set "Disable the command prompt script processing also?" to Yes
 
 Result: Standard users receive "The command prompt has been disabled by your administrator" when attempting to open CMD or run batch scripts
-Step 4 — Blocked USB and Removable Storage
-Navigated to:
+### Step 4 — Blocked USB and Removable Storage
+**Navigated to:**
 User Configuration → Policies → Administrative Templates → System → Removable Storage Access
 •  Set All Removable Storage classes: Deny all access to Enabled
 
 Result: Standard users cannot read from or write to USB drives or removable storage devices
-Step 5 — Tested All Restrictions on CLIENT01
+### Step 5 — Tested All Restrictions on CLIENT01
 •  Ran gpupdate /force on CLIENT01 to apply policies
 •  Signed in as LAB\ajohnson and tested each restriction:
 
-RestrictionResultControl Panel✅ BlockedWindows Settings✅ BlockedCommand Prompt✅ BlockedUSB/Removable Storage✅ Blocked
-Step 6 — AppLocker Configuration (Work in Progress)
+| Restriction | Result |
+| :--- | :--- |
+| Control Panel | Blocked |
+| Windows Settings | Blocked |
+| Command Prompt | Blocked |
+| USB/Removable Storage | Blocked |
+
+### Step 6 — AppLocker Configuration (Work in Progress)
 Attempted to configure AppLocker to block standard users from running unauthorized executables outside of C:\Windows and C:\Program Files.
 Steps completed:
+
 •  Created default Executable Rules in AppLocker
+
 •  Created a Deny rule for Authenticated Users with path *
+
 •  Added exceptions for C:\Program Files\* and C:\Windows\*
+
 •  Named rule Block Unauthorized Executables
+
 •  Set enforcement mode to Enforce rules
+
 •  Enabled and set Application Identity service to Automatic on CLIENT01
+
 •  Linked GPO to Houston → Workstations OU for Computer Configuration to apply
 
 Status: AppLocker rules are confirmed received by CLIENT01 via Get-AppLockerPolicy -Effective -Xml showing EnforcementMode="Enabled" for Exe rules, executables outside approved paths are still running. Further troubleshooting is required.
@@ -66,21 +94,23 @@ Status: AppLocker rules are confirmed received by CLIENT01 via Get-AppLockerPoli
 ## Issues Encountered and How I Fixed Them
 Issue 1 — GPO applying to Domain Admins and blocking Control Panel on DC01
 
-Cause: Workstation-Hardening-Policy GPO created in a previous session with another tool was linked to the root of lab.local and applied to all authenticated users, including Administrator
-Fix: Deleted the Workstation-Hardening-Policy GPO entirely. Cleared residual local group policy settings by running:
+**Cause:** Workstation-Hardening-Policy GPO created in a previous session with another tool was linked to the root of lab.local and applied to all authenticated users, including Administrator
 
-RD /S /Q "%WinDir%\System32\GroupPolicyUsers"
-RD /S /Q "%WinDir%\System32\GroupPolicy"
-gpupdate /force
-Issue 2 — Restrict Standard Users GPO not applying to ajohnson
+**Fix:** Deleted the Workstation-Hardening-Policy GPO entirely. Cleared residual local group policy settings by running:
 
-Cause: GPO was linked to the root of lab.local and Security Filtering only showed Domain Admins
-Fix: Deleted the incorrect link, relinked GPO to _Branches → Houston → Users OU, and changed Security Filtering to Domain Users
+•  RD /S /Q "%WinDir%\System32\GroupPolicyUsers"
+•  RD /S /Q "%WinDir%\System32\GroupPolicy"
+•  gpupdate /force
+•  Issue 2 — Restrict Standard Users GPO not applying to ajohnson
+
+**Cause:** GPO was linked to the root of lab.local and Security Filtering only showed Domain Admins
+
+**Fix:** Deleted the incorrect link, relinked GPO to _Branches → Houston → Users OU, and changed Security Filtering to Domain Users
 
 Issue 3 — AppLocker not blocking unauthorized executables
 
-Cause: Application Identity service was set to Manual and not running
-Status: Still under investigation — AppLocker policy is being received by CLIENT01, but not fully enforcing. Will revisit in a future session.
+**Cause:** Application Identity service was set to Manual and not running
+**Status:** Still under investigation — AppLocker policy is being received by CLIENT01, but not fully enforcing. Will revisit in a future session.
 
 
 ## Key Commands Used
