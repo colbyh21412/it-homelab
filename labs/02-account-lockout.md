@@ -52,7 +52,7 @@ Step 5 - Verified Login
   • Login succeeded, confirming the account was successfully unlocked
 
 ## Issues Encountered and How I Fixed Them
-Issue 1 - Unlock account checkbox not working in ADUC
+### Issue 1 - Unlock account checkbox not working in ADUC
    • Cause: The Account tab showed the unlock checkbox, but unchecking it did not unlock the account
    • Fix: Used Right-click -> Reset Password instead, which includes an **Unlock the user's account** that only appears when the account is actively locked. This method worked correctly
    • **Note:** The Reset Password unlock checkbox is always visible on the layout, but it will automatically check itself and become active only when the Domain Controller recognizes that the account is currently locked
