@@ -117,15 +117,17 @@ Status: AppLocker rules are confirmed received by CLIENT01 via Get-AppLockerPoli
 **Status:** Still under investigation — AppLocker policy is being received by CLIENT01, but not fully enforcing. Will revisit in a future session.
 
 
-## Key Commands Used
-Group Policy
-gpupdate /force                          # Force immediate GPO update on client
-gpresult /r                              # View applied GPOs on current machine
-Get-AppLockerPolicy -Effective -Xml      # View effective AppLocker policy
-Get-Service AppIDSvc                     # Check Application Identity service status
-Start-Service AppIDSvc                   # Start Application Identity service
-Set-Service AppIDSvc -StartupType Automatic  # Set service to start automatically
+# Key Commands Used
 
+## Group Policy
+```
+gpupdate /force                              # Force immediate GPO update on client
+gpresult /r                                  # View applied GPOs on current machine
+Get-AppLockerPolicy -Effective -Xml          # View effective AppLocker policy
+Get-Service AppIDSvc                         # Check Application Identity service status
+Start-Service AppIDSvc                       # Start Application Identity service
+Set-Service AppIDSvc -StartupType Automatic  # Set service to start automatically
+```
 ## What I Learned
 
 How to create and link GPOs to specific OUs to target only certain users
