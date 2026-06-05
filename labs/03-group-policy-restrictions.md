@@ -92,7 +92,7 @@ Steps completed:
 Status: AppLocker rules are confirmed received by CLIENT01 via Get-AppLockerPolicy -Effective -Xml showing EnforcementMode="Enabled" for Exe rules, executables outside approved paths are still running. Further troubleshooting is required.
 
 ## Issues Encountered and How I Fixed Them
-Issue 1 — GPO applying to Domain Admins and blocking Control Panel on DC01
+### Issue 1 — GPO applying to Domain Admins and blocking Control Panel on DC01
 
 **Cause:** Workstation-Hardening-Policy GPO created in a previous session with another tool was linked to the root of lab.local and applied to all authenticated users, including Administrator
 
@@ -104,13 +104,13 @@ Issue 1 — GPO applying to Domain Admins and blocking Control Panel on DC01
 
 •  gpupdate /force
 
-•  Issue 2 — Restrict Standard Users GPO not applying to ajohnson
+### Issue 2 — Restrict Standard Users GPO not applying to ajohnson
 
 **Cause:** GPO was linked to the root of lab.local and Security Filtering only showed Domain Admins
 
 **Fix:** Deleted the incorrect link, relinked GPO to _Branches → Houston → Users OU, and changed Security Filtering to Domain Users
 
-Issue 3 — AppLocker not blocking unauthorized executables
+### Issue 3 — AppLocker not blocking unauthorized executables
 
 **Cause:** Application Identity service was set to Manual and not running
 
