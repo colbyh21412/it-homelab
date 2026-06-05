@@ -99,8 +99,11 @@ Issue 1 — GPO applying to Domain Admins and blocking Control Panel on DC01
 **Fix:** Deleted the Workstation-Hardening-Policy GPO entirely. Cleared residual local group policy settings by running:
 
 •  RD /S /Q "%WinDir%\System32\GroupPolicyUsers"
+
 •  RD /S /Q "%WinDir%\System32\GroupPolicy"
+
 •  gpupdate /force
+
 •  Issue 2 — Restrict Standard Users GPO not applying to ajohnson
 
 **Cause:** GPO was linked to the root of lab.local and Security Filtering only showed Domain Admins
@@ -110,6 +113,7 @@ Issue 1 — GPO applying to Domain Admins and blocking Control Panel on DC01
 Issue 3 — AppLocker not blocking unauthorized executables
 
 **Cause:** Application Identity service was set to Manual and not running
+
 **Status:** Still under investigation — AppLocker policy is being received by CLIENT01, but not fully enforcing. Will revisit in a future session.
 
 
