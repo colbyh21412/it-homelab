@@ -130,27 +130,38 @@ Set-Service AppIDSvc -StartupType Automatic  # Set service to start automaticall
 ```
 ## What I Learned
 
-How to create and link GPOs to specific OUs to target only certain users
-How to block Control Panel, Windows Settings, and Command Prompt via GPO
-How to block USB and removable storage access via GPO
-How Security Filtering controls which users a GPO applies to
-How Computer Configuration policies require computer objects in the linked OU to apply correctly
-How AppLocker requires the Application Identity (AppIDSvc) service to be running to enforce rules
-How unintended GPOs from previous configurations can cause unexpected restrictions across the domain
-The importance of always checking gpresult /r when troubleshooting unexpected policy behavior
+•  How to create and link GPOs to specific OUs to target only certain users
+
+•  How to block Control Panel, Windows Settings, and Command Prompt via GPO
+
+•  How to block USB and removable storage access via GPO
+
+•  How Security Filtering controls which users a GPO applies to
+
+•  How Computer Configuration policies require computer objects in the linked OU to apply correctly
+
+•  How AppLocker requires the Application Identity (AppIDSvc) service to be running to enforce rules
+
+•  How unintended GPOs from previous configurations can cause unexpected restrictions across the domain
+
+•  The importance of always checking gpresult /r when troubleshooting unexpected policy behavior
 
 
 ## Real World Application
 Group Policy restrictions are used in every corporate environment to:
 
-Prevent users from changing system settings
-Stop unauthorized software from running
-Protect against data theft via USB drives
-Reduce the attack surface on workstations
+•  Prevent users from changing system settings
+
+•  Stop unauthorized software from running
+
+•  Protect against data theft via USB drives
+
+•  Reduce the attack surface on workstations
 
 Help desk technicians need to understand GPOs because many user complaints ("I can't open Control Panel", "my USB drive isn't working") are caused by intentional policy restrictions rather than technical faults.
 
 ## Next Steps
 
-Revisit AppLocker and resolve the enforcement issue
-Lab 04 — DHCP Setup
+•  Revisit AppLocker and resolve the enforcement issue
+
+•  Lab 04 — DHCP Setup
