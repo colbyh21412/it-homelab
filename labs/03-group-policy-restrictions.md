@@ -71,7 +71,7 @@ Result: Standard users cannot read from or write to USB drives or removable stor
 | Command Prompt | Blocked |
 | USB/Removable Storage | Blocked |
 
-### Step 6 — AppLocker Configuration (Work in Progress)
+### Step 6 — AppLocker Configuration
 Attempted to configure AppLocker to block standard users from running unauthorized executables outside of C:\Windows and C:\Program Files.
 Steps completed:
 
@@ -116,6 +116,11 @@ Status: AppLocker rules are confirmed received by CLIENT01 via Get-AppLockerPoli
 
 **Status:** Still under investigation — AppLocker policy is being received by CLIENT01, but not fully enforcing. Will revisit in a future session.
 
+**Fix:** Used `sc.exe config AppIDSvc start= auto` to configure the 
+service startup type, then `sc.exe start AppIDSvc` to start it. 
+The service was already running after this, which allowed AppLocker 
+to enforce rules correctly.
+
 
 # Key Commands Used
 
@@ -127,6 +132,8 @@ Get-AppLockerPolicy -Effective -Xml          # View effective AppLocker policy
 Get-Service AppIDSvc                         # Check Application Identity service status
 Start-Service AppIDSvc                       # Start Application Identity service
 Set-Service AppIDSvc -StartupType Automatic  # Set service to start automatically
+sc.exe config AppIDSvc start= auto           # Set Application Identity service to Automatic
+sc.exe start AppIDSvc                        # Start Application Identity service
 ```
 ## What I Learned
 
