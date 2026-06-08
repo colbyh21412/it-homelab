@@ -93,6 +93,7 @@ This is known as the DORA process (Discover, Offer, Request, Acknowledge)
 
 ### Lease Duration
 IP addresses assigned by DHCP are temporary, or leased. My lab scope uses an 8-day lease duration, meaning:
+
   •  At 50% of the lease (day 4), the client automatically tries to renew
   
   •  At 87.5% (day 7), the client tries again if renewal failed
@@ -101,6 +102,7 @@ IP addresses assigned by DHCP are temporary, or leased. My lab scope uses an 8-d
 
 ### IP exhaustion 
 If all IPs in the scope are in use and a new device tries to connect, DHCP cannot assign an address. This is called IP exhaustion and is a real help desk troubleshooting scenario. Fixes include:
+
   •  Expanding the DHCP scope range
   
   •  Shortening the lease duration
@@ -112,27 +114,27 @@ If a device cannot reach a DHCP server, it assigns itself an Automatic Private I
 
 ## Issues Encountered and How I Fixed Them
 ### Issue 1 - CLIENT01 received a 169.254.x.x APIPA address instead of a DHCP address
+
   • **Cause:** DC01 had a pending restart, which prevented the DHCP service from responding to requests
   
   • **Fix:** Restarted DC01, then disabled and re-enabled the network adapter on CLIENT01 to force a fresh DHCP request
   
 ### Issue 2 - ipconfig /renew returned NCB error
+
   • **Cause:** Network adapter state did not allow the renew command in its current configuration
   
   • **Fix:** Used netsh interface ip set address "Ethernet" dhcp to set the adapter to DHCP mode, then disabled and re-enabled the adapter via ncpa.cpl to force a fresh lease request
   
 ## Key Commands Used
+```
 ipconfig /all                                                # View full network
-
 ipconfig /release                                            # Release current DHCP lease
-
 ipconfig /renew                                              # Request a new DHCP lease
-
 netsh interface ip set address "Ethernet" dhcp               # Set adapter to DHCP via command line
-
 netsh interface ip set address name="Ethernet" source=dhcp   # Alternative DHCP command
-
+```
 ## What I Learned
+
   • How to install and configure the DHCP Server role on Windows Server
   
   • How to create a DHCP scope with an appropriate IP range
@@ -151,6 +153,7 @@ netsh interface ip set address name="Ethernet" source=dhcp   # Alternative DHCP 
   
 ## Real World Applications
 DHCP is fundamental to every network environment. In a real help desk role, you will encounter DHCP issues regularly:
+
   • User cannot connect to the network → check if they received a valid IP or an APIPA address
   
   • Multiple users losing connectivity → possible IP exhaustion in the DHCP scope
@@ -160,4 +163,5 @@ DHCP is fundamental to every network environment. In a real help desk role, you 
   • User gets wrong IP range → check which DHCP server is responding on the network
   
 ## Next Steps
+
 • Lab 05 - Shared Folders and Permissions
