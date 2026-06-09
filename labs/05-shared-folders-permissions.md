@@ -49,13 +49,13 @@ C:\Shares\
     
     • Removed Everyone from the permissions list
     
-    • Added Domain Users with Read permission
+    • Added Domain Users with Full Control permission
     
     • Clicked OK → OK → Close
     
   ### Step 3 - Set NTFS Permissions on Each Subfolder
 
-    For Each subfolder, inheritance was disabled and permissions were set explicitly:
+    For each subfolder, inheritance was disabled, and permissions were set explicitly:
     
       1. Right-clicked folder → Properties → Security tab → Advanced
       
@@ -95,43 +95,86 @@ C:\Shares\
   | bmartinez | Accounting | Denied | Access | Denied |
   | cwalker | ITSupport | Denied | Denied | Access |
 
-  All permissions working correctly - each user can only access their department folder.
+  All permissions are working correctly - each user can only access their department folder.
 
 ## Share vs NTFS Permissions
+Two layers of permissions control access to shared folders:
+
+  Share Permissions — control access over the network
+  
+    • Applied at the shared folder level
+    
+    • Only apply when accessing the folder over the network (via UNC path like \\server\share)
+    
+    • We set Domain Users to Read at the share level
+
+  NTFS Permissions — control access at the file system level
+
+    • Applied to individual folders and files
+    
+    • Apply both locally and over the network
+    
+    • More granular than share permissions
+     
+    • The most restrictive permission between share and NTFS wins
+
+**Best practice:** Set share permissions to **Full Control** for 
+**Authenticated Users** and use NTFS permissions to control granular 
+access. This simplifies management and lets NTFS handle all the 
+security. Setting Share permissions to Read while NTFS is set to 
+Modify creates a conflict — the most restrictive permission wins, 
+meaning users would be blocked from modifying files over the network 
+despite having Modify at the NTFS level.
+
+
 
 ## Issues Encountered and How I Fixed Them
 
-Issue 1 — All users could access all three folders initially
+### Issue 1 — All users could access all three folders initially
 
 **Cause:** The Users group was still listed in the NTFS permissions due to inherited permissions from the parent folder
 
 **Fix:** Disabled inheritance on each subfolder and converted to explicit permissions, then removed the Users group from each folder
 
-Issue 2 — Could not remove Users group without disabling inheritance first
+### Issue 2 — Could not remove the Users group without disabling inheritance first
 
 **Cause:** "You can't remove Users because this object is inheriting permissions from its parent" error
 
-**Fix:** Used Advanced Security Settings → Disable inheritance → Convert inherited permissions into explicit permissions, then removed Users group
+**Fix:** Used Advanced Security Settings → Disable inheritance → Convert inherited permissions into explicit permissions, then removed the Users group
 
-Issue 3 — Accounting group accidentally added to ITSupport folder
+### Issue 3 — Accounting group accidentally added to ITSupport folder
 
 **Cause:** Wrong group added during permissions setup
 
 **Fix:** Opened ITSupport folder Security tab → removed Accounting group
 
-Issue 4 — CLIENT01 kept losing network connectivity and reverting to APIPA address
+### Issue 4 — CLIENT01 kept losing network connectivity and reverting to APIPA address
 
 **Cause:** Network adapter instability with DHCP on Bridged Adapter
 
 **Fix:** Set CLIENT01 back to static IP (192.168.1.20) with DNS pointing to DC01 (192.168.1.10) for stability
 
-Issue 5 — cwalker could not log in due to domain connectivity loss
+### Issue 5 — cwalker could not log in due to domain connectivity loss
 
 **Cause:** CLIENT01 lost domain connectivity after network adapter issues
 
 **Fix:** Reset network adapter settings, confirmed ping to DC01 succeeded, then domain login worked correctly
 
 ## Key Commands and Paths used
+
+### Accessing Shared Folders
+
+```
+\\192.168.1.10\Shares           # UNC path to access shares from CLIENT01
+\\servername\sharename          # General UNC path format
+```
+### Network Troubleshooting
+
+```
+ping 192.168.1.10              # Test Connectivity to DC01              
+ipconfig /all                  # Check IP, DNS, and DHCP status
+nltest /dsgetdc:lab.local      # Verify domain controller is reachable
+```
 
 ## What I learned
 
