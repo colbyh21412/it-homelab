@@ -1,3 +1,58 @@
+# IT Home Lab — Active Directory & Help Desk Portfolio
+
+## About This Project
+A hands-on home lab built using VirtualBox simulating a small business IT environment. This lab covers core Active Directory administration, Group Policy, networking, and help desk skills relevant to entry level IT support roles. All labs were completed without cloud services — entirely on local virtual machines.
+
+**Environment:**
+- Host: Windows 11
+- Virtualization: VirtualBox
+- Server OS: Windows Server 2025 Evaluation
+- Client OS: Windows Server 2025 Evaluation
+- Help Desk: osTicket (self-hosted on IIS)
+
+---
+
+## Labs Completed
+
+| # | Lab | Status |
+|---|---|---|
+| 01 | Active Directory Domain Setup | ✅ Complete |
+| 02 | Account Lockout Policy | ✅ Complete |
+| 03 | Group Policy Restrictions | ✅ Complete |
+| 04 | DHCP Setup | ✅ Complete |
+| 05 | Shared Folders and Permissions | ✅ Complete |
+| 06 | Event Viewer Investigation | ✅ Complete |
+| 07 | Bulk User Creation | ✅ Complete |
+| 08 | User Offboarding | ✅ Complete |
+| 09 | RDP Troubleshooting | ✅ Complete |
+| 10 | Printer Deployment via Logon Script | ✅ Complete |
+
+---
+
+## Skills Demonstrated
+
+- Active Directory user and group management
+- Group Policy Object (GPO) creation and troubleshooting
+- DHCP scope configuration and lease management
+- DNS configuration and troubleshooting
+- Shared folder creation with NTFS permissions
+- Windows Event Viewer security log investigation
+- PowerShell scripting for bulk AD operations
+- User onboarding and offboarding procedures
+- Remote Desktop (RDP) support and troubleshooting
+- Printer deployment via logon scripts
+- Help desk ticketing using osTicket
+- VirtualBox virtualization and VM management
+
+---
+
+## Certifications
+
+- Associate of Science in IT Support — Eastfield College (Dallas College)
+- Google IT Support Certificate — Coursera
+
+---
+
 # IT Home Lab
 
 About This Lab:
